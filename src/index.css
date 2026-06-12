@@ -10,14 +10,19 @@
     color-scheme: dark;
   }
   body {
-    @apply bg-app text-ink antialiased;
+    background-color: #08080F;
+    color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: contain;
   }
   input, textarea, select {
-    @apply bg-raised text-ink border-border;
+    background-color: #1A1A26;
+    color: #FFFFFF;
+    border-color: #1E1E2E;
   }
   input::placeholder, textarea::placeholder {
-    @apply text-ink-muted;
+    color: #6B6B88;
   }
 }
 
