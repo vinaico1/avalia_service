@@ -107,7 +107,7 @@ export default function Home() {
 
           {/* Filtros */}
           {mostrarFiltros && (
-            <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <div className="mt-2.5 flex gap-2 overflow-x-auto pb-2 scrollbar-thin-x">
               <button onClick={() => setAreaFiltro('')}
                 className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${
                   areaFiltro === '' ? 'bg-brand-600 text-white border-brand-600' : 'bg-raised border-border text-ink-muted'

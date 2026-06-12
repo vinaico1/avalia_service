@@ -37,4 +37,9 @@
   .pb-safe     { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-thin-x::-webkit-scrollbar { height: 3px; }
+  .scrollbar-thin-x::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin-x::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 9999px; }
+  .scrollbar-thin-x::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+  .scrollbar-thin-x { scrollbar-width: thin; scrollbar-color: #D1D5DB transparent; }
 }
