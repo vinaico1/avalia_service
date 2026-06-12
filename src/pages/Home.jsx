@@ -48,9 +48,9 @@ export default function Home() {
   const primeiroNome = perfil?.nome?.split(' ')[0] ?? ''
 
   return (
-    <div className="min-h-screen bg-page flex flex-col">
+    <div className="h-screen bg-page flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="bg-card border-b border-border safe-top sticky top-0 z-30 shadow-sm">
+      <header className="bg-card border-b border-border safe-top shrink-0 z-10 shadow-sm">
         <div className="px-4 pt-4 pb-3">
           {/* Top row */}
           <div className="flex items-center justify-between mb-3">
@@ -128,7 +128,7 @@ export default function Home() {
       </header>
 
       {/* Content */}
-      <main className="flex-1 px-4 py-4 space-y-3 max-w-lg mx-auto w-full pb-28">
+      <main className="flex-1 overflow-y-auto overscroll-contain scrollbar-thin-y px-4 py-4 space-y-3 max-w-lg mx-auto w-full pb-28">
         <div className="flex items-center justify-between">
           <span className="text-xs text-ink-muted">
             {loading ? 'Carregando...' : (
