@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,15 +7,24 @@
   html {
     -webkit-tap-highlight-color: transparent;
     scroll-behavior: smooth;
+    color-scheme: dark;
   }
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-app text-ink antialiased;
     overscroll-behavior-y: contain;
+  }
+  input, textarea, select {
+    @apply bg-raised text-ink border-border;
+  }
+  input::placeholder, textarea::placeholder {
+    @apply text-ink-muted;
   }
 }
 
 @layer utilities {
-  .safe-top    { padding-top: env(safe-area-inset-top); }
+  .safe-top    { padding-top:    env(safe-area-inset-top); }
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
   .pb-safe     { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 }

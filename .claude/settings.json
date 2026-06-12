@@ -3,7 +3,11 @@
     "allow": [
       "PowerShell(Get-ChildItem \"c:\\\\Projetos\\\\avalia_service\" -ErrorAction SilentlyContinue; if \\(-not \\(Test-Path \"c:\\\\Projetos\\\\avalia_service\"\\)\\) { Write-Host \"Directory is empty/new\" })",
       "PowerShell(cd \"c:\\\\Projetos\\\\avalia_service\"; $env:VITE_SUPABASE_URL=\"https://placeholder.supabase.co\"; $env:VITE_SUPABASE_ANON_KEY=\"placeholder_key\"; npm run build 2>&1 | Select-Object -Last 20)",
-      "PowerShell(cd \"c:\\\\Projetos\\\\avalia_service\"; Get-ChildItem -Recurse -Exclude node_modules,dist,.claude | Where-Object { -not $_.PSIsContainer } | ForEach-Object { $_.FullName.Replace\\(\"c:\\\\Projetos\\\\avalia_service\\\\\",\"\"\\) } | Sort-Object)"
+      "PowerShell(cd \"c:\\\\Projetos\\\\avalia_service\"; Get-ChildItem -Recurse -Exclude node_modules,dist,.claude | Where-Object { -not $_.PSIsContainer } | ForEach-Object { $_.FullName.Replace\\(\"c:\\\\Projetos\\\\avalia_service\\\\\",\"\"\\) } | Sort-Object)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "WebFetch(domain:ztybwlmfczoasvojpdrt.supabase.co)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' 'https://ztybwlmfczoasvojpdrt.supabase.co/rest/v1/prestadores?select=count&limit=1' -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0eWJ3bG1mY3pvYXN2b2pwZHJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyOTU4MzksImV4cCI6MjA5Njg3MTgzOX0.UprKoIFll7ljK50hsKNBIBIqDhvBuKMXxjcSokmJsao' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0eWJ3bG1mY3pvYXN2b2pwZHJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyOTU4MzksImV4cCI6MjA5Njg3MTgzOX0.UprKoIFll7ljK50hsKNBIBIqDhvBuKMXxjcSokmJsao')"
     ]
   }
 }

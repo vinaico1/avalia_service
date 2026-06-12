@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Phone, Search, AlertCircle, CheckCircle } from 'lucide-react'
+import { X, Phone, Search, CheckCircle } from 'lucide-react'
 import { StarPicker } from '../ui/StarRating'
 import {
   buscarPrestadorPorTelefone,
@@ -19,6 +19,8 @@ const AREAS = [
   'Mármores/Granitos','Montador de Móveis','Pedreiro','Pintor','Piscineiro',
   'Refrigeração','Segurança/Portões','Outros',
 ]
+
+const LABEL_NOTA = { 0:'', 1:'😡 Péssimo', 2:'😞 Ruim', 3:'😐 Regular', 4:'😊 Bom', 5:'🌟 Excelente!' }
 
 export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
   const { perfil } = useAuth()
@@ -42,10 +44,17 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
     }
   }, [prestadorInicial, perfil])
 
+  const maskTel = (v) => {
+    let d = v.replace(/\D/g, '').slice(0, 11)
+    if (d.length > 10) return d.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+    if (d.length > 6)  return d.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3')
+    if (d.length > 2)  return d.replace(/(\d{2})(\d+)/, '($1) $2')
+    return d
+  }
+
   async function handleBuscar() {
     if (!telefone.trim()) return
-    setBuscando(true)
-    setErro('')
+    setBuscando(true); setErro('')
     const found = await buscarPrestadorPorTelefone(telefone)
     setBuscando(false)
     if (found) {
@@ -59,142 +68,117 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
   }
 
   async function handleCadastrarEAvaliar() {
-    if (!novoNome.trim() || !novaArea) {
-      setErro('Preencha nome e área de atuação')
-      return
-    }
-    setSalvando(true)
-    setErro('')
-    const { data, error } = await cadastrarPrestador({
-      nome: novoNome.trim(),
-      telefone: telefone.trim(),
-      area_atuacao: novaArea,
-    })
-    if (error) {
-      setErro(error.message.includes('unique') ? 'Telefone já cadastrado.' : error.message)
-      setSalvando(false)
-      return
-    }
-    setPrestador(data)
-    setEtapa('avaliar')
-    setSalvando(false)
+    if (!novoNome.trim() || !novaArea) { setErro('Preencha nome e área de atuação'); return }
+    setSalvando(true); setErro('')
+    const { data, error } = await cadastrarPrestador({ nome: novoNome.trim(), telefone: telefone.trim(), area_atuacao: novaArea })
+    if (error) { setErro(error.message.includes('unique') ? 'Telefone já cadastrado.' : error.message); setSalvando(false); return }
+    setPrestador(data); setEtapa('avaliar'); setSalvando(false)
   }
 
   async function handleSalvarAvaliacao() {
     if (nota === 0) { setErro('Selecione uma nota'); return }
-    if (nota <= 3 && !observacao.trim()) {
-      setErro('Para notas baixas, o comentário é obrigatório')
-      return
-    }
-    setSalvando(true)
-    setErro('')
-    const { error } = await salvarAvaliacao({
-      prestador_id: prestador.id,
-      morador_id: perfil.id,
-      nota,
-      observacao: observacao.trim() || null,
-    })
+    if (nota <= 3 && !observacao.trim()) { setErro('Para notas baixas, o comentário é obrigatório'); return }
+    setSalvando(true); setErro('')
+    const { error } = await salvarAvaliacao({ prestador_id: prestador.id, morador_id: perfil.id, nota, observacao: observacao.trim() || null })
     setSalvando(false)
     if (error) { setErro(error.message); return }
     setSucesso(true)
-    setTimeout(() => { onSucesso?.(); onClose() }, 1500)
-  }
-
-  const maskTel = (v) => {
-    let d = v.replace(/\D/g, '').slice(0, 11)
-    if (d.length > 10) d = d.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-    else if (d.length > 6) d = d.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3')
-    else if (d.length > 2) d = d.replace(/(\d{2})(\d+)/, '($1) $2')
-    return d
+    setTimeout(() => { onSucesso?.(); onClose() }, 1400)
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-xl max-h-[90vh] overflow-y-auto">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-card border border-border w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl max-h-[90vh] overflow-y-auto">
+
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1 sm:hidden">
+          <div className="w-10 h-1 bg-ink-faint rounded-full" />
+        </div>
+
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white z-10">
-          <h2 className="text-lg font-bold text-gray-900">
-            {etapa === 'buscar' && 'Avaliar Prestador'}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <h2 className="text-base font-bold text-ink">
+            {etapa === 'buscar' && 'Buscar Prestador'}
             {etapa === 'cadastrar' && 'Novo Prestador'}
             {etapa === 'avaliar' && 'Sua Avaliação'}
           </h2>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-            <X size={20} />
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl border border-border text-ink-muted hover:text-ink transition-colors">
+            <X size={16} />
           </button>
         </div>
 
-        <div className="p-4 space-y-4">
+        <div className="p-5 space-y-4">
           {sucesso && (
-            <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700">
+            <div className="flex items-center gap-3 p-4 bg-ok/10 border border-ok/20 rounded-2xl text-ok">
               <CheckCircle size={20} />
-              <span className="font-semibold">Avaliação salva com sucesso!</span>
+              <span className="font-semibold text-sm">Avaliação salva com sucesso!</span>
             </div>
           )}
 
           {erro && (
-            <div className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-              <AlertCircle size={16} />
-              {erro}
+            <div className="p-3 bg-danger/10 border border-danger/20 rounded-2xl text-danger text-sm">
+              ⚠ {erro}
             </div>
           )}
 
-          {/* ETAPA: BUSCAR */}
+          {/* BUSCAR */}
           {etapa === 'buscar' && (
             <div className="space-y-4">
-              <p className="text-sm text-gray-500">
-                Informe o telefone do prestador. Se já estiver cadastrado, você avaliará diretamente. Se não, poderá cadastrá-lo.
-              </p>
+              <p className="text-sm text-ink-muted">Informe o telefone do prestador para buscar ou cadastrar.</p>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Telefone do Prestador
-                </label>
+                <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Telefone do Prestador</label>
                 <div className="flex gap-2">
-                  <input
-                    type="tel"
-                    value={telefone}
-                    onChange={e => setTelefone(maskTel(e.target.value))}
-                    placeholder="(15) 99999-9999"
-                    className="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    onKeyDown={e => e.key === 'Enter' && handleBuscar()}
-                  />
+                  <div className="relative flex-1">
+                    <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+                    <input
+                      type="tel"
+                      value={telefone}
+                      onChange={e => setTelefone(maskTel(e.target.value))}
+                      placeholder="(15) 99999-9999"
+                      onKeyDown={e => e.key === 'Enter' && handleBuscar()}
+                      className="w-full pl-10 pr-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/40 transition-colors"
+                    />
+                  </div>
                   <button
                     onClick={handleBuscar}
                     disabled={buscando || !telefone.trim()}
-                    className="bg-brand-600 text-white px-4 rounded-xl disabled:opacity-50 transition-colors hover:bg-brand-700"
+                    className="w-12 flex items-center justify-center bg-lime hover:bg-lime-dark text-app rounded-2xl disabled:opacity-40 transition-colors"
                   >
-                    {buscando ? <span className="animate-spin">⏳</span> : <Search size={20} />}
+                    {buscando
+                      ? <span className="w-4 h-4 border-2 border-app/30 border-t-app rounded-full animate-spin" />
+                      : <Search size={18} />}
                   </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* ETAPA: CADASTRAR */}
+          {/* CADASTRAR */}
           {etapa === 'cadastrar' && (
-            <div className="space-y-4">
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700">
+            <div className="space-y-3">
+              <div className="p-3 bg-raised border border-border rounded-2xl text-xs text-ink-muted">
                 Prestador não encontrado. Preencha os dados para cadastrá-lo.
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
-                <input value={telefone} disabled className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 text-gray-500" />
+                <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Telefone</label>
+                <input value={telefone} disabled className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm text-ink-muted" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
+                <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Nome *</label>
                 <input
                   value={novoNome}
                   onChange={e => setNovoNome(e.target.value)}
                   placeholder="Ex: João Silva"
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/40 transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Área de Atuação *</label>
+                <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Área de Atuação *</label>
                 <select
                   value={novaArea}
                   onChange={e => setNovaArea(e.target.value)}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/40 transition-colors"
                 >
                   <option value="">Selecione...</option>
                   {AREAS.map(a => <option key={a} value={a}>{a}</option>)}
@@ -203,69 +187,70 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
               <button
                 onClick={handleCadastrarEAvaliar}
                 disabled={salvando}
-                className="w-full bg-brand-600 text-white font-bold py-3.5 rounded-xl hover:bg-brand-700 transition-colors disabled:opacity-50"
+                className="w-full bg-lime hover:bg-lime-dark text-app font-bold py-4 rounded-2xl transition-colors disabled:opacity-50"
               >
                 {salvando ? 'Cadastrando...' : 'Cadastrar e Avaliar'}
               </button>
             </div>
           )}
 
-          {/* ETAPA: AVALIAR */}
+          {/* AVALIAR */}
           {etapa === 'avaliar' && prestador && (
             <div className="space-y-5">
-              <div className="p-3 bg-gray-50 border border-gray-200 rounded-xl">
-                <p className="font-bold text-gray-900">{prestador.nome}</p>
-                <p className="text-sm text-gray-500">{prestador.area_atuacao}</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <Phone size={12} className="text-gray-400" />
-                  <span className="text-xs text-gray-500">{prestador.telefone}</span>
+              {/* Info do prestador */}
+              <div className="p-4 bg-raised border border-border rounded-2xl">
+                <p className="font-bold text-ink">{prestador.nome}</p>
+                <p className="text-xs text-ink-muted mt-0.5">{prestador.area_atuacao}</p>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <Phone size={11} className="text-ink-muted" />
+                  <span className="text-xs text-ink-muted">{prestador.telefone}</span>
                 </div>
               </div>
 
+              {/* Estrelas */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Sua nota (0 = Não Recomendado)
-                </label>
+                <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-3">Sua nota</label>
                 <div className="space-y-2">
                   <StarPicker value={nota} onChange={setNota} />
                   {nota > 0 && (
-                    <p className="text-sm text-gray-500">
-                      {nota === 1 && '😡 Péssimo'}
-                      {nota === 2 && '😞 Ruim'}
-                      {nota === 3 && '😐 Regular'}
-                      {nota === 4 && '😊 Bom'}
-                      {nota === 5 && '🌟 Excelente!'}
-                    </p>
+                    <p className="text-sm text-ink-muted">{LABEL_NOTA[nota]}</p>
                   )}
                   <button
                     type="button"
                     onClick={() => setNota(0)}
-                    className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${nota === 0 ? 'bg-red-100 border-red-300 text-red-700 font-semibold' : 'border-gray-200 text-gray-500 hover:bg-red-50'}`}
+                    className={`mt-1 text-xs px-3 py-1.5 rounded-xl border transition-colors ${
+                      nota === 0
+                        ? 'bg-danger/15 border-danger/30 text-danger font-semibold'
+                        : 'border-border text-ink-muted hover:border-danger/30 hover:text-danger'
+                    }`}
                   >
                     ✕ Nota 0 — Não Recomendado
                   </button>
                 </div>
               </div>
 
+              {/* Comentário */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Comentário {nota > 0 && nota <= 3 ? <span className="text-red-500">*</span> : '(opcional)'}
+                <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">
+                  Comentário {nota > 0 && nota <= 3 ? <span className="text-danger normal-case font-normal ml-1">* obrigatório</span> : <span className="text-ink-muted normal-case font-normal ml-1">(opcional)</span>}
                 </label>
                 <textarea
                   value={observacao}
                   onChange={e => setObservacao(e.target.value)}
                   placeholder="Descreva sua experiência..."
                   rows={3}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/40 transition-colors resize-none"
                 />
               </div>
 
               <button
                 onClick={handleSalvarAvaliacao}
                 disabled={salvando || sucesso}
-                className="w-full bg-brand-600 text-white font-bold py-3.5 rounded-xl hover:bg-brand-700 transition-colors disabled:opacity-50"
+                className="w-full bg-lime hover:bg-lime-dark text-app font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lime"
               >
-                {salvando ? 'Salvando...' : 'Salvar Avaliação'}
+                {salvando
+                  ? <span className="w-5 h-5 border-2 border-app/30 border-t-app rounded-full animate-spin" />
+                  : 'Salvar Avaliação'}
               </button>
             </div>
           )}

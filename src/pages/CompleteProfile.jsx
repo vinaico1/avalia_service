@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Home, Phone, AlertCircle, MapPin } from 'lucide-react'
+import { MapPin, Phone, User, ArrowRight } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function CompleteProfile() {
@@ -14,117 +14,124 @@ export default function CompleteProfile() {
   const maskTel = (v) => {
     let d = v.replace(/\D/g, '').slice(0, 11)
     if (d.length > 10) return d.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-    if (d.length > 6) return d.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3')
-    if (d.length > 2) return d.replace(/(\d{2})(\d+)/, '($1) $2')
+    if (d.length > 6)  return d.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3')
+    if (d.length > 2)  return d.replace(/(\d{2})(\d+)/, '($1) $2')
     return d
   }
 
   async function handleSalvar() {
     if (!nome.trim() || !telefone.trim() || !quadra.trim() || !lote.trim()) {
-      setErro('Todos os campos são obrigatórios')
-      return
+      setErro('Todos os campos são obrigatórios'); return
     }
-    setSalvando(true)
-    setErro('')
-    const { error } = await completarPerfil({ nome: nome.trim(), telefone, quadra: quadra.toUpperCase().trim(), lote: lote.toUpperCase().trim() })
+    setSalvando(true); setErro('')
+    const { error } = await completarPerfil({
+      nome: nome.trim(), telefone,
+      quadra: quadra.toUpperCase().trim(),
+      lote: lote.toUpperCase().trim(),
+    })
     setSalvando(false)
     if (error) {
-      if (error.message.includes('unique') || error.message.includes('duplicate')) {
-        setErro('Esta combinação de Quadra + Lote já está cadastrada. Contate o administrador.')
-      } else {
-        setErro(error.message)
-      }
+      setErro(error.message.includes('unique') || error.message.includes('duplicate')
+        ? 'Esta Quadra + Lote já está cadastrada. Contate o administrador.'
+        : error.message)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-brand-700 to-brand-900 flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pt-12 pb-4">
-        <div className="bg-white/20 p-4 rounded-2xl mb-4">
-          <Home size={36} className="text-white" />
+    <div className="min-h-screen bg-app flex flex-col relative overflow-hidden">
+      <div className="absolute -top-20 -right-20 w-72 h-72 bg-lime/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="flex-1 flex flex-col justify-end px-6 pb-10 pt-16 relative z-10">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="w-14 h-14 bg-lime/10 border border-lime/20 rounded-2xl flex items-center justify-center mb-5">
+            <MapPin size={24} className="text-lime" />
+          </div>
+          <h1 className="text-3xl font-extrabold text-ink leading-tight">
+            Onde fica<br />
+            <span className="text-lime">sua residência?</span>
+          </h1>
+          <p className="text-ink-muted text-sm mt-2 leading-relaxed">
+            Esses dados identificam você no condomínio.
+          </p>
         </div>
-        <h1 className="text-2xl font-bold text-white text-center">Quase lá!</h1>
-        <p className="text-brand-200 text-center mt-1 text-sm px-4">
-          Informe os dados da sua residência para continuar
-        </p>
-      </div>
 
-      <div className="bg-white rounded-t-3xl px-6 pt-8 pb-safe pb-10">
-        <h2 className="text-lg font-bold text-gray-900 mb-1">Completar Cadastro</h2>
-        <p className="text-sm text-gray-500 mb-6">
-          Estes dados identificam sua residência no condomínio.
-        </p>
+        <div className="bg-card border border-border rounded-3xl p-6 shadow-card space-y-4">
+          {erro && (
+            <div className="p-3 bg-danger-dim border border-danger/20 rounded-xl text-danger text-sm">
+              ⚠ {erro}
+            </div>
+          )}
 
-        {erro && (
-          <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm mb-4">
-            <AlertCircle size={16} className="mt-0.5 shrink-0" />
-            {erro}
-          </div>
-        )}
-
-        <div className="space-y-4">
+          {/* Nome */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nome Completo *</label>
-            <input
-              value={nome}
-              onChange={e => setNome(e.target.value)}
-              placeholder="Seu nome"
-              className="w-full border border-gray-300 rounded-xl px-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Telefone *</label>
+            <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Nome completo</label>
             <div className="relative">
-              <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+              <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+              <input
+                value={nome}
+                onChange={e => setNome(e.target.value)}
+                placeholder="Seu nome"
+                className="w-full pl-10 pr-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/60 focus:ring-1 focus:ring-lime/30 transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Telefone */}
+          <div>
+            <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Telefone</label>
+            <div className="relative">
+              <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
               <input
                 type="tel"
                 value={telefone}
                 onChange={e => setTelefone(maskTel(e.target.value))}
                 placeholder="(15) 99999-9999"
-                className="w-full pl-10 pr-4 py-3.5 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full pl-10 pr-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/60 focus:ring-1 focus:ring-lime/30 transition-colors"
               />
             </div>
           </div>
 
+          {/* Quadra + Lote */}
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Quadra *</label>
-              <div className="relative">
-                <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  value={quadra}
-                  onChange={e => setQuadra(e.target.value)}
-                  placeholder="Ex: A"
-                  maxLength={5}
-                  className="w-full pl-9 pr-3 py-3.5 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-500 uppercase"
-                />
-              </div>
+              <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Quadra</label>
+              <input
+                value={quadra}
+                onChange={e => setQuadra(e.target.value)}
+                placeholder="A"
+                maxLength={5}
+                className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm text-center font-bold uppercase focus:outline-none focus:border-lime/60 focus:ring-1 focus:ring-lime/30 transition-colors"
+              />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Lote *</label>
+              <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Lote</label>
               <input
                 value={lote}
                 onChange={e => setLote(e.target.value)}
-                placeholder="Ex: 12"
+                placeholder="12"
                 maxLength={6}
-                className="w-full px-4 py-3.5 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-500 uppercase"
+                className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm text-center font-bold uppercase focus:outline-none focus:border-lime/60 focus:ring-1 focus:ring-lime/30 transition-colors"
               />
             </div>
           </div>
 
-          <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl">
-            <p className="text-xs text-blue-700">
-              A combinação Quadra + Lote identifica sua residência e deve ser única. Moradores da mesma casa devem usar a mesma combinação.
+          <div className="px-1">
+            <p className="text-ink-muted text-xs leading-relaxed">
+              Cada residência só pode ter um cadastro. Moradores da mesma casa usam a mesma combinação.
             </p>
           </div>
 
           <button
             onClick={handleSalvar}
             disabled={salvando}
-            className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-60 text-base"
+            className="w-full bg-lime hover:bg-lime-dark text-app font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lime mt-2"
           >
-            {salvando ? 'Salvando...' : 'Concluir Cadastro'}
+            {salvando ? (
+              <span className="w-5 h-5 border-2 border-app/30 border-t-app rounded-full animate-spin" />
+            ) : (
+              <> Concluir Cadastro <ArrowRight size={18} /> </>
+            )}
           </button>
         </div>
       </div>
