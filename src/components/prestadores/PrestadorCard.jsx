@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { MessageCircle, Phone, Star, Users } from 'lucide-react'
 import { StarDisplay } from '../ui/StarRating'
 import { AlertBadge, getAlertConfig } from '../ui/AlertBadge'
@@ -8,6 +9,7 @@ function whatsappUrl(tel) {
 }
 
 export function PrestadorCard({ prestador, onAvaliar }) {
+  const [mostrarTel, setMostrarTel] = useState(false)
   const cfg = getAlertConfig(prestador.nota_media)
   const temNota = prestador.total_avaliacoes > 0
   const nota = temNota ? Number(prestador.nota_media) : null
@@ -84,12 +86,22 @@ export function PrestadorCard({ prestador, onAvaliar }) {
             <MessageCircle size={15} />
             WhatsApp
           </a>
-          <a
-            href={`tel:${prestador.telefone}`}
-            className="w-10 flex items-center justify-center bg-raised hover:bg-border border border-border rounded-xl text-ink-muted hover:text-ink transition-colors touch-manipulation"
-          >
-            <Phone size={15} />
-          </a>
+          {mostrarTel ? (
+            <a
+              href={`tel:${prestador.telefone}`}
+              className="flex items-center gap-1.5 bg-raised border border-border rounded-xl px-3 py-2.5 text-ink text-xs font-semibold hover:bg-border transition-colors touch-manipulation"
+            >
+              <Phone size={13} className="text-ink-muted shrink-0" />
+              {prestador.telefone}
+            </a>
+          ) : (
+            <button
+              onClick={() => setMostrarTel(true)}
+              className="w-10 flex items-center justify-center bg-raised hover:bg-border border border-border rounded-xl text-ink-muted hover:text-ink transition-colors touch-manipulation"
+            >
+              <Phone size={15} />
+            </button>
+          )}
           <button
             onClick={() => onAvaliar(prestador)}
             className="flex items-center justify-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors touch-manipulation shadow-btn"
