@@ -9,10 +9,10 @@ function AppRoutes() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-brand-700 flex items-center justify-center">
+      <div className="min-h-screen bg-brand-600 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-brand-200 text-sm">Carregando...</p>
+          <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-white/70 text-sm">Carregando...</p>
         </div>
       </div>
     )
@@ -48,7 +48,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <div className="relative w-full bg-page min-h-screen sm:max-w-[430px] sm:mx-auto sm:shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_8px_64px_rgba(0,0,0,0.18)]">
+          <AppRoutes />
+        </div>
       </AuthProvider>
     </BrowserRouter>
   )

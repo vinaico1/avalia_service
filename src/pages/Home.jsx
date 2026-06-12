@@ -161,7 +161,7 @@ export default function Home() {
 
       {/* FAB */}
       <div className="fixed bottom-0 left-0 right-0 pb-safe px-4 pb-5 z-20 pointer-events-none">
-        <div className="max-w-lg mx-auto flex justify-center">
+        <div className="max-w-[430px] mx-auto flex justify-center">
           <button
             onClick={() => { setPrestadorSelecionado(null); setModalAberto(true) }}
             className="pointer-events-auto flex items-center gap-2 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold px-6 py-4 rounded-2xl shadow-btn transition-colors"
