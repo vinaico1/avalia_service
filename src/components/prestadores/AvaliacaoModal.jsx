@@ -88,8 +88,8 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-card border border-border w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-card border border-border w-full sm:max-w-md sm:rounded-3xl rounded-t-3xl shadow-sheet max-h-[90vh] overflow-y-auto">
 
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1 sm:hidden">
@@ -103,21 +103,24 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
             {etapa === 'cadastrar' && 'Novo Prestador'}
             {etapa === 'avaliar' && 'Sua Avaliação'}
           </h2>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl border border-border text-ink-muted hover:text-ink transition-colors">
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-xl border border-border bg-raised text-ink-muted hover:text-ink transition-colors"
+          >
             <X size={16} />
           </button>
         </div>
 
         <div className="p-5 space-y-4">
           {sucesso && (
-            <div className="flex items-center gap-3 p-4 bg-ok/10 border border-ok/20 rounded-2xl text-ok">
-              <CheckCircle size={20} />
+            <div className="flex items-center gap-3 p-4 bg-ok-dim border border-ok/20 rounded-2xl text-ok-text">
+              <CheckCircle size={20} className="text-ok shrink-0" />
               <span className="font-semibold text-sm">Avaliação salva com sucesso!</span>
             </div>
           )}
 
           {erro && (
-            <div className="p-3 bg-danger/10 border border-danger/20 rounded-2xl text-danger text-sm">
+            <div className="p-3 bg-danger-dim border border-danger/20 rounded-2xl text-danger-text text-sm">
               ⚠ {erro}
             </div>
           )}
@@ -127,7 +130,9 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
             <div className="space-y-4">
               <p className="text-sm text-ink-muted">Informe o telefone do prestador para buscar ou cadastrar.</p>
               <div>
-                <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Telefone do Prestador</label>
+                <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">
+                  Telefone do Prestador
+                </label>
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
@@ -137,16 +142,16 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
                       onChange={e => setTelefone(maskTel(e.target.value))}
                       placeholder="(15) 99999-9999"
                       onKeyDown={e => e.key === 'Enter' && handleBuscar()}
-                      className="w-full pl-10 pr-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/40 transition-colors"
+                      className="w-full pl-10 pr-4 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
                     />
                   </div>
                   <button
                     onClick={handleBuscar}
                     disabled={buscando || !telefone.trim()}
-                    className="w-12 flex items-center justify-center bg-lime hover:bg-lime-dark text-app rounded-2xl disabled:opacity-40 transition-colors"
+                    className="w-12 flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white rounded-xl disabled:opacity-40 transition-colors shadow-btn"
                   >
                     {buscando
-                      ? <span className="w-4 h-4 border-2 border-app/30 border-t-app rounded-full animate-spin" />
+                      ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       : <Search size={18} />}
                   </button>
                 </div>
@@ -157,12 +162,16 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
           {/* CADASTRAR */}
           {etapa === 'cadastrar' && (
             <div className="space-y-3">
-              <div className="p-3 bg-raised border border-border rounded-2xl text-xs text-ink-muted">
+              <div className="p-3 bg-raised border border-border rounded-xl text-xs text-ink-muted">
                 Prestador não encontrado. Preencha os dados para cadastrá-lo.
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Telefone</label>
-                <input value={telefone} disabled className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm text-ink-muted" />
+                <input
+                  value={telefone}
+                  disabled
+                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm text-ink-muted"
+                />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Nome *</label>
@@ -170,7 +179,7 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
                   value={novoNome}
                   onChange={e => setNovoNome(e.target.value)}
                   placeholder="Ex: João Silva"
-                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/40 transition-colors"
+                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
                 />
               </div>
               <div>
@@ -178,7 +187,7 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
                 <select
                   value={novaArea}
                   onChange={e => setNovaArea(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/40 transition-colors"
+                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
                 >
                   <option value="">Selecione...</option>
                   {AREAS.map(a => <option key={a} value={a}>{a}</option>)}
@@ -187,7 +196,7 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
               <button
                 onClick={handleCadastrarEAvaliar}
                 disabled={salvando}
-                className="w-full bg-lime hover:bg-lime-dark text-app font-bold py-4 rounded-2xl transition-colors disabled:opacity-50"
+                className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-50 shadow-btn"
               >
                 {salvando ? 'Cadastrando...' : 'Cadastrar e Avaliar'}
               </button>
@@ -220,8 +229,8 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
                     onClick={() => setNota(0)}
                     className={`mt-1 text-xs px-3 py-1.5 rounded-xl border transition-colors ${
                       nota === 0
-                        ? 'bg-danger/15 border-danger/30 text-danger font-semibold'
-                        : 'border-border text-ink-muted hover:border-danger/30 hover:text-danger'
+                        ? 'bg-danger-dim border-danger/30 text-danger-text font-semibold'
+                        : 'border-border text-ink-muted hover:border-danger/30 hover:text-danger-text'
                     }`}
                   >
                     ✕ Nota 0 — Não Recomendado
@@ -232,24 +241,28 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
               {/* Comentário */}
               <div>
                 <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">
-                  Comentário {nota > 0 && nota <= 3 ? <span className="text-danger normal-case font-normal ml-1">* obrigatório</span> : <span className="text-ink-muted normal-case font-normal ml-1">(opcional)</span>}
+                  Comentário{' '}
+                  {nota > 0 && nota <= 3
+                    ? <span className="text-danger-text normal-case font-normal ml-1">* obrigatório</span>
+                    : <span className="text-ink-muted normal-case font-normal ml-1">(opcional)</span>
+                  }
                 </label>
                 <textarea
                   value={observacao}
                   onChange={e => setObservacao(e.target.value)}
                   placeholder="Descreva sua experiência..."
                   rows={3}
-                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/40 transition-colors resize-none"
+                  className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all resize-none"
                 />
               </div>
 
               <button
                 onClick={handleSalvarAvaliacao}
                 disabled={salvando || sucesso}
-                className="w-full bg-lime hover:bg-lime-dark text-app font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lime"
+                className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-btn"
               >
                 {salvando
-                  ? <span className="w-5 h-5 border-2 border-app/30 border-t-app rounded-full animate-spin" />
+                  ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   : 'Salvar Avaliação'}
               </button>
             </div>

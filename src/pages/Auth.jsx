@@ -28,89 +28,82 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen bg-app flex flex-col">
-      {/* Decoração de fundo */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -right-32 w-80 h-80 bg-lime/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -left-20 w-60 h-60 bg-lime/3 rounded-full blur-3xl" />
-      </div>
-
-      {/* Hero */}
-      <div className="flex-1 flex flex-col justify-end px-6 pb-10 pt-20 relative z-10">
-        <div className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-lime/10 border border-lime/20 px-3 py-1.5 rounded-full mb-6">
-            <TreePine size={14} className="text-lime" />
-            <span className="text-lime text-xs font-semibold tracking-wide uppercase">Ninho Verde 1</span>
+    <div className="min-h-screen bg-page flex flex-col">
+      {/* Header verde */}
+      <div className="bg-brand-600 px-6 pt-16 pb-20 relative overflow-hidden">
+        <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-brand-700 rounded-full opacity-40" />
+        <div className="absolute -top-6 -left-6 w-32 h-32 bg-brand-500 rounded-full opacity-20" />
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 bg-white/15 px-3 py-1.5 rounded-full mb-5">
+            <TreePine size={14} className="text-white" />
+            <span className="text-white/90 text-xs font-semibold tracking-wide">NINHO VERDE 1</span>
           </div>
-          <h1 className="text-4xl font-extrabold text-ink leading-tight">
-            Avalie os<br />
-            <span className="text-lime">prestadores</span><br />
-            do condomínio
+          <h1 className="text-3xl font-extrabold text-white leading-tight">
+            Avalie os prestadores<br />do condomínio
           </h1>
-          <p className="text-ink-muted text-sm mt-3 leading-relaxed">
-            Compartilhe experiências e encontre os melhores profissionais da região.
+          <p className="text-brand-100 text-sm mt-2">
+            Compartilhe experiências e encontre os melhores profissionais.
           </p>
         </div>
+      </div>
 
-        {/* Card de login */}
-        <div className="bg-card border border-border rounded-3xl p-6 shadow-card">
+      {/* Card flutuante */}
+      <div className="flex-1 px-4 -mt-6 relative z-10">
+        <div className="bg-card rounded-3xl shadow-sheet p-6">
+
+          {/* Tabs */}
           <div className="flex gap-1 bg-raised rounded-2xl p-1 mb-6">
-            <button
-              onClick={() => { setModo('login'); setErro(''); setMsg('') }}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                modo === 'login' ? 'bg-lime text-app shadow-lime' : 'text-ink-muted'
-              }`}
-            >
-              Entrar
-            </button>
-            <button
-              onClick={() => { setModo('cadastro'); setErro(''); setMsg('') }}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                modo === 'cadastro' ? 'bg-lime text-app shadow-lime' : 'text-ink-muted'
-              }`}
-            >
-              Criar conta
-            </button>
+            {['login','cadastro'].map(m => (
+              <button
+                key={m}
+                onClick={() => { setModo(m); setErro(''); setMsg('') }}
+                className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  modo === m
+                    ? 'bg-brand-600 text-white shadow-btn'
+                    : 'text-ink-muted hover:text-ink'
+                }`}
+              >
+                {m === 'login' ? 'Entrar' : 'Criar conta'}
+              </button>
+            ))}
           </div>
 
           {erro && (
-            <div className="flex items-start gap-2 p-3 bg-danger-dim border border-danger/20 rounded-xl text-danger text-sm mb-4">
-              <span className="shrink-0 mt-0.5">⚠</span> {erro}
+            <div className="flex items-start gap-2 p-3 bg-danger-dim rounded-xl text-danger-text text-sm mb-4">
+              <span className="shrink-0">⚠</span> {erro}
             </div>
           )}
           {msg && (
-            <div className="p-3 bg-ok-dim border border-ok/20 rounded-xl text-ok text-sm mb-4">
-              ✓ {msg}
-            </div>
+            <div className="p-3 bg-ok-dim rounded-xl text-ok-text text-sm mb-4">✓ {msg}</div>
           )}
 
-          <div className="space-y-3">
+          <div className="space-y-3 mb-5">
             <div className="relative">
-              <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+              <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className="w-full pl-10 pr-4 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/60 focus:ring-1 focus:ring-lime/30 transition-colors"
+                className="w-full pl-10 pr-4 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
               />
             </div>
             <div className="relative">
-              <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+              <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
               <input
                 type={mostrarSenha ? 'text' : 'password'}
                 value={senha}
                 onChange={e => setSenha(e.target.value)}
                 placeholder="Senha"
                 onKeyDown={e => e.key === 'Enter' && handleEmail()}
-                className="w-full pl-10 pr-11 py-3.5 bg-raised border border-border rounded-2xl text-sm focus:outline-none focus:border-lime/60 focus:ring-1 focus:ring-lime/30 transition-colors"
+                className="w-full pl-10 pr-11 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
               />
               <button
                 type="button"
                 onClick={() => setMostrarSenha(v => !v)}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted"
               >
-                {mostrarSenha ? <EyeOff size={15} /> : <Eye size={15} />}
+                {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
@@ -118,28 +111,24 @@ export default function Auth() {
           <button
             onClick={handleEmail}
             disabled={carregando}
-            className="w-full mt-4 bg-lime hover:bg-lime-dark active:bg-lime-dark text-app font-bold py-4 rounded-2xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lime"
+            className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-btn"
           >
-            {carregando ? (
-              <span className="w-5 h-5 border-2 border-app/30 border-t-app rounded-full animate-spin" />
-            ) : (
-              <>
-                {modo === 'login' ? 'Entrar' : 'Criar conta'}
-                <ArrowRight size={18} />
-              </>
-            )}
+            {carregando
+              ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              : <>{modo === 'login' ? 'Entrar' : 'Criar conta'} <ArrowRight size={18} /></>
+            }
           </button>
 
           {/* Social — em breve */}
-          <div className="mt-5 space-y-2.5 opacity-30 pointer-events-none select-none">
+          <div className="mt-5 space-y-3 opacity-40 pointer-events-none select-none">
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-border" />
-              <span className="text-ink-muted text-xs">em breve</span>
+              <span className="text-ink-muted text-xs font-medium">em breve</span>
               <div className="flex-1 h-px bg-border" />
             </div>
             <div className="flex gap-2">
-              <div className="flex-1 flex items-center justify-center gap-2 border border-border rounded-2xl py-3 text-ink-muted text-sm font-medium">
-                <svg className="w-4 h-4 grayscale" viewBox="0 0 24 24">
+              <div className="flex-1 flex items-center justify-center gap-2 border border-border rounded-xl py-3 text-ink-muted text-sm bg-raised">
+                <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -147,7 +136,7 @@ export default function Auth() {
                 </svg>
                 Google
               </div>
-              <div className="flex-1 flex items-center justify-center gap-2 border border-border rounded-2xl py-3 text-ink-muted text-sm font-medium">
+              <div className="flex-1 flex items-center justify-center gap-2 border border-border rounded-xl py-3 text-ink-muted text-sm bg-raised">
                 <svg className="w-4 h-4 fill-ink-muted" viewBox="0 0 24 24">
                   <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                 </svg>
@@ -157,6 +146,7 @@ export default function Auth() {
           </div>
         </div>
       </div>
+      <div className="h-8" />
     </div>
   )
 }

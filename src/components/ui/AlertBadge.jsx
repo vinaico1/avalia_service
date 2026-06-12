@@ -6,27 +6,29 @@ export function getAlertConfig(nota) {
   if (n === 0) return {
     label: 'Não Recomendado',
     icon: XCircle,
-    cardBorder: 'border-danger/30',
-    cardGlow:   'shadow-[0_0_0_1px_rgba(255,68,85,0.2)]',
-    badge:      'bg-danger/15 text-danger border border-danger/20',
-    dot:        'bg-danger',
+    cardBorder: 'border-danger/40',
+    cardBg: '',
+    badge: 'bg-danger-dim text-danger-text',
+    tip: null,
+    topBar: 'bg-danger',
   }
   if (n <= 3) return {
     label: 'Atenção ao Contratar',
     icon: AlertTriangle,
-    cardBorder: 'border-warn/30',
-    cardGlow:   'shadow-[0_0_0_1px_rgba(255,176,32,0.15)]',
-    badge:      'bg-warn/15 text-warn border border-warn/20',
-    dot:        'bg-warn',
+    cardBorder: 'border-warn/40',
+    cardBg: '',
+    badge: 'bg-warn-dim text-warn-text',
     tip: 'Exija contrato com cláusula de multa',
+    topBar: 'bg-warn',
   }
   return {
     label: 'Bem Recomendado',
     icon: CheckCircle2,
-    cardBorder: 'border-ok/20',
-    cardGlow:   '',
-    badge:      'bg-ok/15 text-ok border border-ok/20',
-    dot:        'bg-ok',
+    cardBorder: 'border-ok/30',
+    cardBg: '',
+    badge: 'bg-ok-dim text-ok-text',
+    tip: null,
+    topBar: 'bg-ok',
   }
 }
 
@@ -35,8 +37,8 @@ export function AlertBadge({ nota }) {
   if (!cfg) return null
   const Icon = cfg.icon
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${cfg.badge}`}>
-      <Icon size={10} />
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.badge}`}>
+      <Icon size={11} />
       {cfg.label}
     </span>
   )

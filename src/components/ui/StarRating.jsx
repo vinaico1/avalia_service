@@ -1,6 +1,6 @@
 import { Star } from 'lucide-react'
 
-export function StarDisplay({ nota, size = 14 }) {
+export function StarDisplay({ nota, size = 15 }) {
   return (
     <div className="flex gap-0.5">
       {[1,2,3,4,5].map(i => (
@@ -8,7 +8,7 @@ export function StarDisplay({ nota, size = 14 }) {
           key={i}
           size={size}
           className={i <= Math.round(nota)
-            ? 'text-lime fill-lime'
+            ? 'text-brand-500 fill-brand-500'
             : 'text-ink-faint fill-ink-faint'}
         />
       ))}
@@ -18,7 +18,7 @@ export function StarDisplay({ nota, size = 14 }) {
 
 export function StarPicker({ value, onChange }) {
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-3">
       {[1,2,3,4,5].map(i => (
         <button
           key={i}
@@ -27,9 +27,9 @@ export function StarPicker({ value, onChange }) {
           className="focus:outline-none touch-manipulation transition-transform active:scale-90"
         >
           <Star
-            size={38}
+            size={42}
             className={i <= value
-              ? 'text-lime fill-lime drop-shadow-[0_0_8px_rgba(170,255,0,0.5)]'
+              ? 'text-brand-500 fill-brand-500 drop-shadow-sm'
               : 'text-ink-faint fill-ink-faint'}
           />
         </button>
