@@ -19,6 +19,10 @@ CREATE TABLE IF NOT EXISTS public.perfis_moradores (
 -- RLS: moradores só veem/editam o próprio perfil
 ALTER TABLE public.perfis_moradores ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Morador vê seu próprio perfil"      ON public.perfis_moradores;
+DROP POLICY IF EXISTS "Morador edita seu próprio perfil"   ON public.perfis_moradores;
+DROP POLICY IF EXISTS "Inserção via trigger ou próprio usuário" ON public.perfis_moradores;
+
 CREATE POLICY "Morador vê seu próprio perfil"
   ON public.perfis_moradores FOR SELECT
   USING (auth.uid() = id);
@@ -71,6 +75,9 @@ CREATE INDEX IF NOT EXISTS idx_prestadores_area ON public.prestadores (area_atua
 -- RLS: qualquer autenticado pode ler, apenas cadastrar (não alterar)
 ALTER TABLE public.prestadores ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Autenticados podem ver prestadores"    ON public.prestadores;
+DROP POLICY IF EXISTS "Autenticados podem cadastrar prestadores" ON public.prestadores;
+
 CREATE POLICY "Autenticados podem ver prestadores"
   ON public.prestadores FOR SELECT
   TO authenticated USING (true);
@@ -96,6 +103,10 @@ CREATE INDEX IF NOT EXISTS idx_avaliacoes_prestador ON public.avaliacoes (presta
 
 -- RLS
 ALTER TABLE public.avaliacoes ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Autenticados veem todas avaliações"      ON public.avaliacoes;
+DROP POLICY IF EXISTS "Morador cria ou atualiza sua avaliação"  ON public.avaliacoes;
+DROP POLICY IF EXISTS "Morador atualiza sua avaliação"          ON public.avaliacoes;
 
 CREATE POLICY "Autenticados veem todas avaliações"
   ON public.avaliacoes FOR SELECT
