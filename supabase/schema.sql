@@ -122,7 +122,8 @@ CREATE POLICY "Morador atualiza sua avaliação"
 
 
 -- 5. VIEW: Prestadores com média e comentários reais das avaliações
-CREATE OR REPLACE VIEW public.prestadores_com_media AS
+DROP VIEW IF EXISTS public.prestadores_com_media;
+CREATE VIEW public.prestadores_com_media AS
 SELECT
   p.id,
   p.nome,
