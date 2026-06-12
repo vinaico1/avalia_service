@@ -33,6 +33,24 @@ export function usePrestadores(filtros = {}) {
   return { prestadores, loading, error, refetch: fetchPrestadores }
 }
 
+export function useMinhasAvaliacoes(moradorId) {
+  const [avaliados, setAvaliados] = useState(new Set())
+  const [rev, setRev] = useState(0)
+
+  useEffect(() => {
+    if (!moradorId) return
+    supabase
+      .from('avaliacoes')
+      .select('prestador_id')
+      .eq('morador_id', moradorId)
+      .then(({ data }) => {
+        if (data) setAvaliados(new Set(data.map(a => a.prestador_id)))
+      })
+  }, [moradorId, rev])
+
+  return { avaliados, refetchAvaliacoes: () => setRev(r => r + 1) }
+}
+
 export function useAreasAtuacao() {
   const [areas, setAreas] = useState([])
 

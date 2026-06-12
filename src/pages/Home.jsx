@@ -2,7 +2,7 @@ import { useState, useMemo, useRef } from 'react'
 import { Search, SlidersHorizontal, X, Plus, LogOut, TreePine } from 'lucide-react'
 import { PrestadorCard } from '../components/prestadores/PrestadorCard'
 import { AvaliacaoModal } from '../components/prestadores/AvaliacaoModal'
-import { usePrestadores, useAreasAtuacao } from '../hooks/usePrestadores'
+import { usePrestadores, useAreasAtuacao, useMinhasAvaliacoes } from '../hooks/usePrestadores'
 import { useAuth } from '../contexts/AuthContext'
 
 function Skeleton() {
@@ -37,6 +37,7 @@ export default function Home() {
 
   const filtros = useMemo(() => ({ busca, area: areaFiltro }), [busca, areaFiltro])
   const { prestadores, loading, refetch } = usePrestadores(filtros)
+  const { avaliados, refetchAvaliacoes } = useMinhasAvaliacoes(perfil?.id)
 
   function handleBuscaChange(v) {
     setBuscaInput(v)
@@ -155,7 +156,12 @@ export default function Home() {
         )}
 
         {!loading && prestadores.map(p => (
-          <PrestadorCard key={p.id} prestador={p} onAvaliar={() => { setPrestadorSelecionado(p); setModalAberto(true) }} />
+          <PrestadorCard
+            key={p.id}
+            prestador={p}
+            jaAvaliou={avaliados.has(p.id)}
+            onAvaliar={() => { setPrestadorSelecionado(p); setModalAberto(true) }}
+          />
         ))}
       </main>
 
@@ -176,7 +182,7 @@ export default function Home() {
         <AvaliacaoModal
           prestadorInicial={prestadorSelecionado}
           onClose={() => { setModalAberto(false); setPrestadorSelecionado(null) }}
-          onSucesso={refetch}
+          onSucesso={() => { refetch(); refetchAvaliacoes() }}
         />
       )}
     </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MessageCircle, Phone, Star, Users } from 'lucide-react'
+import { MessageCircle, Phone, Star, Users, CheckCircle2 } from 'lucide-react'
 import { StarDisplay } from '../ui/StarRating'
 import { AlertBadge, getAlertConfig } from '../ui/AlertBadge'
 
@@ -8,7 +8,7 @@ function whatsappUrl(tel) {
   return `https://wa.me/${d.startsWith('55') ? d : '55' + d}`
 }
 
-export function PrestadorCard({ prestador, onAvaliar }) {
+export function PrestadorCard({ prestador, onAvaliar, jaAvaliou }) {
   const [mostrarTel, setMostrarTel] = useState(false)
   const cfg = getAlertConfig(prestador.nota_media)
   const temNota = prestador.total_avaliacoes > 0
@@ -102,13 +102,20 @@ export function PrestadorCard({ prestador, onAvaliar }) {
               <Phone size={15} />
             </button>
           )}
-          <button
-            onClick={() => onAvaliar(prestador)}
-            className="flex items-center justify-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors touch-manipulation shadow-btn"
-          >
-            <Star size={14} className="fill-white" />
-            Avaliar
-          </button>
+          {jaAvaliou ? (
+            <div className="flex items-center gap-1.5 bg-ok-dim text-ok-text text-sm font-semibold py-2.5 px-4 rounded-xl">
+              <CheckCircle2 size={14} />
+              Avaliado
+            </div>
+          ) : (
+            <button
+              onClick={() => onAvaliar(prestador)}
+              className="flex items-center justify-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors touch-manipulation shadow-btn"
+            >
+              <Star size={14} className="fill-white" />
+              Avaliar
+            </button>
+          )}
         </div>
       </div>
     </article>
