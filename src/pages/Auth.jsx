@@ -30,13 +30,27 @@ export default function Auth() {
   async function handleGoogle() {
     setErro(''); setCarregando('google')
     const { error } = await signInWithGoogle()
-    if (error) { setErro(error.message); setCarregando(null) }
+    if (error) {
+      if (error.message?.includes('provider is not enabled') || error.status === 400) {
+        setErro('Google não está ativado ainda. Use e-mail e senha por enquanto.')
+      } else {
+        setErro(error.message)
+      }
+      setCarregando(null)
+    }
   }
 
   async function handleApple() {
     setErro(''); setCarregando('apple')
     const { error } = await signInWithApple()
-    if (error) { setErro(error.message); setCarregando(null) }
+    if (error) {
+      if (error.message?.includes('provider is not enabled') || error.status === 400) {
+        setErro('Apple Sign-In não está ativado ainda. Use e-mail e senha por enquanto.')
+      } else {
+        setErro(error.message)
+      }
+      setCarregando(null)
+    }
   }
 
   return (
