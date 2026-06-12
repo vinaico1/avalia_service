@@ -58,10 +58,8 @@ CREATE TABLE IF NOT EXISTS public.prestadores (
   id              SERIAL PRIMARY KEY,
   nome            TEXT NOT NULL,
   telefone        TEXT NOT NULL,
-  telefone_limpo  TEXT GENERATED ALWAYS AS (regexp_replace(telefone, '\D', '', 'g')) STORED,
+  telefone_limpo  TEXT GENERATED ALWAYS AS (regexp_replace(telefone, '[^0-9]', '', 'g')) STORED,
   area_atuacao    TEXT NOT NULL,
-  obs_positiva    TEXT,
-  obs_negativa    TEXT,
   criado_em       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT uq_prestador_telefone UNIQUE (telefone_limpo)
 );
@@ -112,7 +110,7 @@ CREATE POLICY "Morador atualiza sua avaliação"
   TO authenticated USING (auth.uid() = morador_id);
 
 
--- 5. VIEW: Prestadores com média calculada em tempo real
+-- 5. VIEW: Prestadores com média e comentários reais das avaliações
 CREATE OR REPLACE VIEW public.prestadores_com_media AS
 SELECT
   p.id,
@@ -120,14 +118,28 @@ SELECT
   p.telefone,
   p.telefone_limpo,
   p.area_atuacao,
-  p.obs_positiva,
-  p.obs_negativa,
   p.criado_em,
-  COALESCE(ROUND(AVG(a.nota)::NUMERIC, 1), NULL) AS nota_media,
-  COUNT(a.id) AS total_avaliacoes
+  COALESCE(ROUND(AVG(a.nota)::NUMERIC, 1), NULL)      AS nota_media,
+  COUNT(a.id)                                          AS total_avaliacoes,
+  -- Últimos comentários positivos (nota >= 4)
+  (SELECT STRING_AGG(obs.observacao, ' | ' ORDER BY obs.criado_em DESC)
+   FROM (SELECT observacao, criado_em FROM public.avaliacoes
+         WHERE prestador_id = p.id AND nota >= 4 AND observacao IS NOT NULL
+         ORDER BY criado_em DESC LIMIT 3) obs)         AS obs_positiva,
+  -- Últimos comentários negativos (nota <= 2)
+  (SELECT STRING_AGG(obs.observacao, ' | ' ORDER BY obs.criado_em DESC)
+   FROM (SELECT observacao, criado_em FROM public.avaliacoes
+         WHERE prestador_id = p.id AND nota <= 2 AND observacao IS NOT NULL
+         ORDER BY criado_em DESC LIMIT 3) obs)         AS obs_negativa
 FROM public.prestadores p
 LEFT JOIN public.avaliacoes a ON a.prestador_id = p.id
 GROUP BY p.id;
 
 -- Permissão na view
 GRANT SELECT ON public.prestadores_com_media TO authenticated;
+
+-- HABILITAR RLS NA VIEW (Supabase requer isso para views com join)
+-- A view herda as policies das tabelas base, então não precisa de policy própria.
+-- Mas precisamos garantir que a view seja acessível via REST:
+GRANT SELECT ON public.prestadores TO anon;
+GRANT SELECT ON public.prestadores_com_media TO anon;
