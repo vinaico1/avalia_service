@@ -87,8 +87,13 @@ export default function CompleteProfile() {
           <div className="flex gap-3">
             <div className="flex-1">
               <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Quadra</label>
-              <input value={quadra} onChange={e => setQuadra(e.target.value)} placeholder="A" maxLength={5}
-                className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm text-center font-bold uppercase focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all" />
+              <input
+                value={quadra}
+                onChange={e => setQuadra(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
+                placeholder="AA"
+                maxLength={2}
+                className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm text-center font-bold uppercase focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
+              />
             </div>
             <div className="flex-1">
               <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Lote</label>
