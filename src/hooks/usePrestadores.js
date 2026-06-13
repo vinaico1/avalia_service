@@ -13,6 +13,8 @@ export function usePrestadores(filtros = {}) {
     let query = supabase
       .from('prestadores_com_media')
       .select('*')
+      .order('nota_media', { ascending: false, nullsFirst: false })
+      .order('total_avaliacoes', { ascending: false })
       .order('nome', { ascending: true })
 
     if (filtros.area) {
