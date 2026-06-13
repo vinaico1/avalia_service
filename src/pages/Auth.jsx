@@ -157,7 +157,11 @@ export default function Auth() {
           </div>
         </div>
       </div>
-      <div className="h-8" />
+      <div className="px-5 py-6">
+        <p className="text-[11px] text-ink-muted leading-relaxed text-center">
+          ⚠️ Este é um projeto independente criado por morador do condomínio, sem vínculo com a administração do Ninho Verde 1. As avaliações refletem exclusivamente a opinião dos usuários que contrataram os serviços. Prestadores que desejarem atualizar ou remover seus dados poderão solicitar diretamente pelo aplicativo.
+        </p>
+      </div>
     </div>
   )
 }
