@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { TreePine, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import { TreePine, Mail, Lock, Eye, EyeOff, ArrowRight, KeyRound } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Auth() {
@@ -110,11 +110,13 @@ export default function Auth() {
           </div>
 
           {modo === 'login' && (
-            <div className="flex justify-end -mt-1">
-              <Link to="/esqueci-senha" className="text-xs text-brand-600 hover:text-brand-700 font-semibold">
-                Esqueci minha senha
-              </Link>
-            </div>
+            <Link
+              to="/esqueci-senha"
+              className="flex items-center justify-center gap-2 w-full border border-border bg-raised hover:bg-border text-ink-muted hover:text-ink text-sm font-semibold py-3 rounded-xl transition-colors"
+            >
+              <KeyRound size={15} />
+              Recuperar senha
+            </Link>
           )}
 
           <button

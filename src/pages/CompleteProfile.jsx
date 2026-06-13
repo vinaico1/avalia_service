@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MapPin, Phone, User, ArrowRight, Home } from 'lucide-react'
+import { Phone, User, ArrowRight, Home, Mail } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function CompleteProfile() {
@@ -56,6 +56,15 @@ export default function CompleteProfile() {
           {erro && (
             <div className="p-3 bg-danger-dim rounded-xl text-danger-text text-sm">⚠ {erro}</div>
           )}
+
+          {/* E-mail de recuperação — somente leitura */}
+          <div className="flex items-center gap-3 px-3 py-3 bg-raised border border-border rounded-xl">
+            <Mail size={15} className="text-ink-muted shrink-0" />
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold text-ink-muted uppercase tracking-wider leading-none mb-0.5">E-mail de recuperação</p>
+              <p className="text-sm text-ink truncate">{session?.user?.email}</p>
+            </div>
+          </div>
 
           <div>
             <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Nome completo</label>
