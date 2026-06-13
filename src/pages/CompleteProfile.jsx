@@ -1,6 +1,22 @@
 import { useState } from 'react'
-import { Phone, User, ArrowRight, Home, Mail } from 'lucide-react'
+import { Phone, User, ArrowRight, Home, Mail, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+
+const TERMOS = [
+  'As avaliações, comentários e notas publicadas são de inteira responsabilidade de seus autores.',
+  'O usuário compromete-se a publicar apenas informações verdadeiras, baseadas em experiências reais de contratação, abstendo-se de realizar acusações, ofensas, calúnias, difamações ou qualquer conteúdo que possa violar direitos de terceiros.',
+  'É proibida a publicação de conteúdo discriminatório, ofensivo, ilegal ou que contenha informações falsas.',
+  'O administrador da plataforma não realiza verificação prévia das avaliações e não se responsabiliza pelas opiniões emitidas pelos usuários.',
+  'A plataforma atua exclusivamente como um ambiente colaborativo para compartilhamento de experiências entre moradores, não realizando indicação, recomendação, certificação ou garantia da qualidade dos serviços prestados.',
+  'O usuário concorda que avaliações consideradas ofensivas, ilegais ou que violem este termo poderão ser removidas sem aviso prévio.',
+  'Os prestadores de serviço cadastrados poderão solicitar atualização, correção ou remoção de seus dados mediante contato com o administrador da plataforma.',
+  'Os dados pessoais coletados serão utilizados exclusivamente para identificação dos usuários e funcionamento da plataforma, nos termos da Lei Geral de Proteção de Dados (Lei nº 13.709/2018 - LGPD).',
+  'Ao concluir o cadastro, o usuário declara ter lido, compreendido e aceitado integralmente este Termo de Uso e Responsabilidade.',
+]
+
+function dataHoje() {
+  return new Date().toLocaleDateString('pt-BR')
+}
 
 export default function CompleteProfile() {
   const { session, completarPerfil } = useAuth()
@@ -8,6 +24,7 @@ export default function CompleteProfile() {
   const [telefone, setTelefone] = useState('')
   const [quadra, setQuadra] = useState('')
   const [lote, setLote] = useState('')
+  const [aceitouTermos, setAceitouTermos] = useState(false)
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
 
@@ -22,6 +39,9 @@ export default function CompleteProfile() {
   async function handleSalvar() {
     if (!nome.trim() || !telefone.trim() || !quadra.trim() || !lote.trim()) {
       setErro('Todos os campos são obrigatórios'); return
+    }
+    if (!aceitouTermos) {
+      setErro('Você precisa aceitar os Termos de Uso para continuar'); return
     }
     setSalvando(true); setErro('')
     const { error } = await completarPerfil({
@@ -51,7 +71,7 @@ export default function CompleteProfile() {
         </div>
       </div>
 
-      <div className="flex-1 px-4 -mt-6 relative z-10">
+      <div className="flex-1 px-4 -mt-6 relative z-10 pb-8">
         <div className="bg-card rounded-3xl shadow-sheet p-6 space-y-4">
           {erro && (
             <div className="p-3 bg-danger-dim rounded-xl text-danger-text text-sm">⚠ {erro}</div>
@@ -106,15 +126,58 @@ export default function CompleteProfile() {
             Cada residência tem uma combinação única de Quadra + Lote no condomínio.
           </p>
 
-          <button onClick={handleSalvar} disabled={salvando}
-            className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-btn">
+          {/* Termo de uso */}
+          <div className="border border-border rounded-2xl overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-3 bg-raised border-b border-border">
+              <ShieldCheck size={15} className="text-brand-600 shrink-0" />
+              <p className="text-xs font-bold text-ink uppercase tracking-wider">Termo de Uso e Responsabilidade</p>
+            </div>
+            <div className="h-44 overflow-y-auto scrollbar-thin-y px-4 py-3 space-y-2.5 bg-card">
+              {TERMOS.map((t, i) => (
+                <p key={i} className="text-xs text-ink-muted leading-relaxed">
+                  <span className="font-semibold text-ink">{i + 1}.</span> {t}
+                </p>
+              ))}
+              <p className="text-xs text-ink-muted pt-1">
+                <span className="font-semibold text-ink">Data do aceite:</span> {dataHoje()}
+              </p>
+            </div>
+          </div>
+
+          {/* Checkbox aceite */}
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <div className="relative mt-0.5 shrink-0">
+              <input
+                type="checkbox"
+                checked={aceitouTermos}
+                onChange={e => setAceitouTermos(e.target.checked)}
+                className="sr-only"
+              />
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
+                aceitouTermos
+                  ? 'bg-brand-600 border-brand-600'
+                  : 'bg-raised border-border group-hover:border-brand-400'
+              }`}>
+                {aceitouTermos && (
+                  <svg viewBox="0 0 12 10" className="w-3 h-3 fill-none stroke-white stroke-2">
+                    <polyline points="1,5 4,9 11,1" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+            </div>
+            <span className="text-sm text-ink leading-snug">
+              Aceito os <span className="font-semibold text-brand-600">Termos de Uso e Responsabilidade</span>
+            </span>
+          </label>
+
+          <button onClick={handleSalvar} disabled={salvando || !aceitouTermos}
+            className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-40 flex items-center justify-center gap-2 shadow-btn">
             {salvando
               ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               : <>Concluir Cadastro <ArrowRight size={18} /></>}
           </button>
         </div>
       </div>
-      <div className="h-8" />
     </div>
   )
 }
