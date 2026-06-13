@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Phone, User, ArrowRight, Home, Mail, ShieldCheck } from 'lucide-react'
+import { Phone, User, ArrowRight, Home, Mail, ShieldCheck, LogOut } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 const TERMOS = [
@@ -18,14 +18,23 @@ function dataHoje() {
   return new Date().toLocaleDateString('pt-BR')
 }
 
+function fieldClass(invalid) {
+  return `w-full py-3.5 bg-raised border rounded-xl text-sm focus:outline-none transition-all ${
+    invalid
+      ? 'border-danger focus:border-danger focus:ring-2 focus:ring-danger/20'
+      : 'border-border focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20'
+  }`
+}
+
 export default function CompleteProfile() {
-  const { session, completarPerfil } = useAuth()
+  const { session, completarPerfil, signOut } = useAuth()
   const [nome, setNome] = useState(session?.user?.user_metadata?.full_name || '')
   const [telefone, setTelefone] = useState('')
   const [quadra, setQuadra] = useState('')
   const [lote, setLote] = useState('')
   const [aceitouTermos, setAceitouTermos] = useState(false)
   const [salvando, setSalvando] = useState(false)
+  const [tentou, setTentou] = useState(false)
   const [erro, setErro] = useState('')
 
   const maskTel = (v) => {
@@ -36,9 +45,18 @@ export default function CompleteProfile() {
     return d
   }
 
+  const erros = {
+    nome:     tentou && !nome.trim(),
+    telefone: tentou && !telefone.trim(),
+    quadra:   tentou && !quadra.trim(),
+    lote:     tentou && !lote.trim(),
+    termos:   tentou && !aceitouTermos,
+  }
+
   async function handleSalvar() {
+    setTentou(true)
     if (!nome.trim() || !telefone.trim() || !quadra.trim() || !lote.trim()) {
-      setErro('Todos os campos são obrigatórios'); return
+      setErro('Preencha todos os campos obrigatórios'); return
     }
     if (!aceitouTermos) {
       setErro('Você precisa aceitar os Termos de Uso para continuar'); return
@@ -63,8 +81,17 @@ export default function CompleteProfile() {
       <div className="bg-brand-600 px-6 pt-16 pb-20 relative overflow-hidden">
         <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-brand-700 rounded-full opacity-40" />
         <div className="relative z-10">
-          <div className="w-12 h-12 bg-white/15 rounded-2xl flex items-center justify-center mb-4">
-            <Home size={22} className="text-white" />
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-12 h-12 bg-white/15 rounded-2xl flex items-center justify-center">
+              <Home size={22} className="text-white" />
+            </div>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 text-white text-xs font-semibold px-3 py-2 rounded-xl transition-colors"
+            >
+              <LogOut size={14} />
+              Sair
+            </button>
           </div>
           <h1 className="text-2xl font-extrabold text-white">Quase lá!</h1>
           <p className="text-brand-100 text-sm mt-1">Informe os dados da sua residência.</p>
@@ -73,11 +100,12 @@ export default function CompleteProfile() {
 
       <div className="flex-1 px-4 -mt-6 relative z-10 pb-8">
         <div className="bg-card rounded-3xl shadow-sheet p-6 space-y-4">
+
           {erro && (
             <div className="p-3 bg-danger-dim rounded-xl text-danger-text text-sm">⚠ {erro}</div>
           )}
 
-          {/* E-mail de recuperação — somente leitura */}
+          {/* E-mail — somente leitura */}
           <div className="flex items-center gap-3 px-3 py-3 bg-raised border border-border rounded-xl">
             <Mail size={15} className="text-ink-muted shrink-0" />
             <div className="min-w-0">
@@ -86,39 +114,68 @@ export default function CompleteProfile() {
             </div>
           </div>
 
+          {/* Nome */}
           <div>
-            <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Nome completo</label>
+            <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">
+              Nome completo <span className="text-danger">*</span>
+            </label>
             <div className="relative">
               <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-              <input value={nome} onChange={e => setNome(e.target.value)} placeholder="Seu nome"
-                className="w-full pl-10 pr-4 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all" />
+              <input
+                value={nome}
+                onChange={e => setNome(e.target.value)}
+                placeholder="Seu nome"
+                className={`${fieldClass(erros.nome)} pl-10 pr-4`}
+              />
             </div>
+            {erros.nome && <p className="text-xs text-danger mt-1 pl-1">Informe seu nome completo</p>}
           </div>
 
+          {/* Telefone */}
           <div>
-            <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Telefone</label>
+            <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">
+              Telefone <span className="text-danger">*</span>
+            </label>
             <div className="relative">
               <Phone size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-              <input type="tel" value={telefone} onChange={e => setTelefone(maskTel(e.target.value))} placeholder="(15) 99999-9999"
-                className="w-full pl-10 pr-4 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all" />
+              <input
+                type="tel"
+                value={telefone}
+                onChange={e => setTelefone(maskTel(e.target.value))}
+                placeholder="(15) 99999-9999"
+                className={`${fieldClass(erros.telefone)} pl-10 pr-4`}
+              />
             </div>
+            {erros.telefone && <p className="text-xs text-danger mt-1 pl-1">Informe seu telefone</p>}
           </div>
 
+          {/* Quadra + Lote */}
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Quadra</label>
+              <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">
+                Quadra <span className="text-danger">*</span>
+              </label>
               <input
                 value={quadra}
                 onChange={e => setQuadra(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
                 placeholder="AA"
                 maxLength={2}
-                className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm text-center font-bold uppercase focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
+                className={`${fieldClass(erros.quadra)} px-4 text-center font-bold uppercase`}
               />
+              {erros.quadra && <p className="text-xs text-danger mt-1 text-center">Obrigatório</p>}
             </div>
             <div className="flex-1">
-              <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Lote</label>
-              <input value={lote} onChange={e => setLote(e.target.value)} placeholder="12" maxLength={6}
-                className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm text-center font-bold uppercase focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all" />
+              <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">
+                Lote <span className="text-danger">*</span>
+              </label>
+              <input
+                value={lote}
+                onChange={e => setLote(e.target.value)}
+                placeholder="12"
+                maxLength={6}
+                className={`${fieldClass(erros.lote)} px-4 text-center font-bold uppercase`}
+              />
+              {erros.lote && <p className="text-xs text-danger mt-1 text-center">Obrigatório</p>}
             </div>
           </div>
 
@@ -127,7 +184,7 @@ export default function CompleteProfile() {
           </p>
 
           {/* Termo de uso */}
-          <div className="border border-border rounded-2xl overflow-hidden">
+          <div className={`border rounded-2xl overflow-hidden transition-colors ${erros.termos ? 'border-danger' : 'border-border'}`}>
             <div className="flex items-center gap-2 px-4 py-3 bg-raised border-b border-border">
               <ShieldCheck size={15} className="text-brand-600 shrink-0" />
               <p className="text-xs font-bold text-ink uppercase tracking-wider">Termo de Uso e Responsabilidade</p>
@@ -154,9 +211,11 @@ export default function CompleteProfile() {
                 className="sr-only"
               />
               <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-                aceitouTermos
-                  ? 'bg-brand-600 border-brand-600'
-                  : 'bg-raised border-border group-hover:border-brand-400'
+                erros.termos
+                  ? 'bg-danger-dim border-danger'
+                  : aceitouTermos
+                    ? 'bg-brand-600 border-brand-600'
+                    : 'bg-raised border-border group-hover:border-brand-400'
               }`}>
                 {aceitouTermos && (
                   <svg viewBox="0 0 12 10" className="w-3 h-3 fill-none stroke-white stroke-2">
@@ -165,13 +224,19 @@ export default function CompleteProfile() {
                 )}
               </div>
             </div>
-            <span className="text-sm text-ink leading-snug">
-              Aceito os <span className="font-semibold text-brand-600">Termos de Uso e Responsabilidade</span>
-            </span>
+            <div>
+              <span className="text-sm text-ink leading-snug">
+                Aceito os <span className="font-semibold text-brand-600">Termos de Uso e Responsabilidade</span>
+              </span>
+              {erros.termos && <p className="text-xs text-danger mt-0.5">Você precisa aceitar os termos</p>}
+            </div>
           </label>
 
-          <button onClick={handleSalvar} disabled={salvando || !aceitouTermos}
-            className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-40 flex items-center justify-center gap-2 shadow-btn">
+          <button
+            onClick={handleSalvar}
+            disabled={salvando}
+            className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-btn"
+          >
             {salvando
               ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               : <>Concluir Cadastro <ArrowRight size={18} /></>}
