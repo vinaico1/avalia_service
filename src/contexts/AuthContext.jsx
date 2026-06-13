@@ -6,6 +6,9 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(undefined) // undefined = loading
   const [perfil, setPerfil] = useState(null)
+  const [recoveryMode, setRecoveryMode] = useState(
+    () => window.location.hash.includes('type=recovery')
+  )
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -13,8 +16,10 @@ export function AuthProvider({ children }) {
       if (session) loadPerfil(session.user.id)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
+      if (event === 'PASSWORD_RECOVERY') setRecoveryMode(true)
+      if (event === 'USER_UPDATED') setRecoveryMode(false)
       if (session) loadPerfil(session.user.id)
       else setPerfil(null)
     })
@@ -53,6 +58,16 @@ export function AuthProvider({ children }) {
     return supabase.auth.signUp({ email, password })
   }
 
+  async function resetPassword(email) {
+    return supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/redefinir-senha`,
+    })
+  }
+
+  async function updatePassword(password) {
+    return supabase.auth.updateUser({ password })
+  }
+
   async function signOut() {
     await supabase.auth.signOut()
   }
@@ -78,12 +93,15 @@ export function AuthProvider({ children }) {
     loading: session === undefined,
     isAuthenticated: !!session,
     cadastroCompleto: perfil?.cadastro_completo === true,
+    recoveryMode,
     signInWithGoogle,
     signInWithApple,
     signInWithEmail,
     signUpWithEmail,
     signOut,
     completarPerfil,
+    resetPassword,
+    updatePassword,
     refreshPerfil: () => session && loadPerfil(session.user.id),
   }
 

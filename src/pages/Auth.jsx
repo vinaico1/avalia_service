@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { TreePine, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -107,6 +108,14 @@ export default function Auth() {
               </button>
             </div>
           </div>
+
+          {modo === 'login' && (
+            <div className="flex justify-end -mt-1">
+              <Link to="/esqueci-senha" className="text-xs text-brand-600 hover:text-brand-700 font-semibold">
+                Esqueci minha senha
+              </Link>
+            </div>
+          )}
 
           <button
             onClick={handleEmail}

@@ -3,9 +3,11 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Auth from './pages/Auth'
 import CompleteProfile from './pages/CompleteProfile'
 import Home from './pages/Home'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 function AppRoutes() {
-  const { loading, isAuthenticated, cadastroCompleto } = useAuth()
+  const { loading, isAuthenticated, cadastroCompleto, recoveryMode } = useAuth()
 
   if (loading) {
     return (
@@ -18,10 +20,20 @@ function AppRoutes() {
     )
   }
 
+  if (recoveryMode) {
+    return (
+      <Routes>
+        <Route path="/redefinir-senha" element={<ResetPassword />} />
+        <Route path="*" element={<Navigate to="/redefinir-senha" replace />} />
+      </Routes>
+    )
+  }
+
   if (!isAuthenticated) {
     return (
       <Routes>
         <Route path="/login" element={<Auth />} />
+        <Route path="/esqueci-senha" element={<ForgotPassword />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     )
