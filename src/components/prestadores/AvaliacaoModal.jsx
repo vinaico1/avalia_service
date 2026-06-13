@@ -30,6 +30,7 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
   const [prestador, setPrestador] = useState(prestadorInicial || null)
   const [novoNome, setNovoNome] = useState('')
   const [novaArea, setNovaArea] = useState('')
+  const [novaAreaCustom, setNovaAreaCustom] = useState('')
   const [nota, setNota] = useState(0)
   const [observacao, setObservacao] = useState('')
   const [salvando, setSalvando] = useState(false)
@@ -68,9 +69,11 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
   }
 
   async function handleCadastrarEAvaliar() {
+    const areaFinal = novaArea === 'Outros' ? novaAreaCustom.trim() : novaArea
     if (!novoNome.trim() || !novaArea) { setErro('Preencha nome e área de atuação'); return }
+    if (novaArea === 'Outros' && !novaAreaCustom.trim()) { setErro('Descreva o tipo de serviço'); return }
     setSalvando(true); setErro('')
-    const { data, error } = await cadastrarPrestador({ nome: novoNome.trim(), telefone: telefone.trim(), area_atuacao: novaArea })
+    const { data, error } = await cadastrarPrestador({ nome: novoNome.trim(), telefone: telefone.trim(), area_atuacao: areaFinal })
     if (error) { setErro(error.message.includes('unique') ? 'Telefone já cadastrado.' : error.message); setSalvando(false); return }
     setPrestador(data); setEtapa('avaliar'); setSalvando(false)
   }
@@ -182,16 +185,25 @@ export function AvaliacaoModal({ prestadorInicial, onClose, onSucesso }) {
                   className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <label className="block text-xs font-semibold text-ink-muted uppercase tracking-wider mb-1.5">Área de Atuação *</label>
                 <select
                   value={novaArea}
-                  onChange={e => setNovaArea(e.target.value)}
+                  onChange={e => { setNovaArea(e.target.value); setNovaAreaCustom('') }}
                   className="w-full px-4 py-3.5 bg-raised border border-border rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
                 >
                   <option value="">Selecione...</option>
                   {AREAS.map(a => <option key={a} value={a}>{a}</option>)}
                 </select>
+                {novaArea === 'Outros' && (
+                  <input
+                    value={novaAreaCustom}
+                    onChange={e => setNovaAreaCustom(e.target.value)}
+                    placeholder="Descreva o tipo de serviço..."
+                    autoFocus
+                    className="w-full px-4 py-3.5 bg-raised border border-brand-400 rounded-xl text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
+                  />
+                )}
               </div>
               <button
                 onClick={handleCadastrarEAvaliar}
