@@ -1,6 +1,12 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 
+const DIACRITICS = /\p{Mn}/gu
+
+function sem_acento(str) {
+  return String(str ?? '').normalize('NFD').replace(DIACRITICS, '').toLowerCase().trim()
+}
+
 export function usePrestadores(filtros = {}) {
   const [prestadores, setPrestadores] = useState([])
   const [loading, setLoading] = useState(true)
@@ -18,15 +24,21 @@ export function usePrestadores(filtros = {}) {
       .order('nome', { ascending: true })
 
     if (filtros.area) {
-      query = query.ilike('area_atuacao', `%${filtros.area}%`)
-    }
-    if (filtros.busca) {
-      query = query.or(`nome.ilike.%${filtros.busca}%,area_atuacao.ilike.%${filtros.busca}%`)
+      query = query.eq('area_atuacao', filtros.area)
     }
 
     const { data, error } = await query
-    if (error) setError(error.message)
-    else setPrestadores(data || [])
+    if (error) { setError(error.message); setLoading(false); return }
+
+    let results = data || []
+    if (filtros.busca) {
+      const q = sem_acento(filtros.busca)
+      results = results.filter(p =>
+        sem_acento(p.nome).includes(q) || sem_acento(p.area_atuacao).includes(q)
+      )
+    }
+
+    setPrestadores(results)
     setLoading(false)
   }, [filtros.area, filtros.busca])
 
